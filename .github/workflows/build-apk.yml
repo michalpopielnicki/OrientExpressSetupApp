@@ -1,0 +1,65 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the project
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Create the Android project
+        run: npx cap add android
+
+      - name: Apply app icon, theme, splash screen and Back-button handling
+        run: |
+          RES=android/app/src/main/res
+          rm -rf $RES/mipmap-*
+          find $RES -name 'splash.*' -delete
+          cp -r android-overrides/res/. $RES/
+          MAIN=$(find android/app/src/main/java -name MainActivity.java)
+          cp android-overrides/MainActivity.java "$MAIN"
+
+      - name: Copy the web app into the Android project
+        run: npx cap sync android
+
+      - name: Use the project's fixed signing key (so new builds install over old ones)
+        run: |
+          mkdir -p ~/.android
+          cp signing/debug.keystore ~/.android/debug.keystore
+
+      - name: Build the APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Name the APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk orient-express-setup.apk
+
+      - name: Upload the APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: orient-express-setup-apk
+          path: orient-express-setup.apk
