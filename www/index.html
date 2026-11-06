@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a1110" />
+    <meta name="description" content="Setup randomizer for the Horror on the Orient Express board game." />
+    <title>Horror on the Orient Express Setup Randomizer</title>
+
+    <!-- Fonts load when the phone is online; offline the app falls back to the CSS font stacks. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+
+    <link rel="stylesheet" href="./assets/app.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      // Called by the Android app when the system Back button/gesture is used.
+      // Clicks the on-screen "Back" button if the current screen has one.
+      window.__oesBack = function () {
+        var buttons = document.querySelectorAll("button.back");
+        for (var i = 0; i < buttons.length; i++) {
+          var b = buttons[i];
+          if (!b.disabled && b.textContent.trim().toLowerCase() === "back") {
+            b.click();
+            window.scrollTo(0, 0);
+            return true;
+          }
+        }
+        return false;
+      };
+    </script>
+    <script src="./assets/app.js"></script>
+  </body>
+</html>
